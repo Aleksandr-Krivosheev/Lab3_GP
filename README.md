@@ -9,4 +9,6 @@ Images drawn in this program will be saved in an 800x600 .gif file.
 ```
 python3 pypaint.py
 ```
-
+```
+pyinstaller Laba3.spec
+```

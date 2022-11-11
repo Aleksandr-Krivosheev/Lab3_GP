@@ -4,6 +4,8 @@ from tkinter import *
 from tkinter.colorchooser import *
 import pyscreenshot as ImageGrab
 from PIL import Image
+import numpy as np
+import cv2
 
 # TOOLS
 PENCIL,BRUSH1, BRUSH, ERASER, LINE, RECTANGLE, OVAL = list(range(7))
@@ -139,6 +141,10 @@ class Tool:
         self.save = PhotoImage(file = "Images/save.gif")
         self.clear = PhotoImage(file = "Images/clear.gif")
         self.open = PhotoImage(file = "Images/open.gif")
+        self.cv2 = PhotoImage(file="Images/CV2_1.gif")
+        self.cv2_2 = PhotoImage(file="Images/CV2_2.gif")
+
+
 
         
         TOOLS = [
@@ -183,6 +189,7 @@ class Tool:
         frame2 = Frame(parent, width = 40)
         frame1.pack_propagate(False)
         frame2.pack_propagate(False)
+
         
         
 #------------------ ICON CREATION AND PLACEMENT ------------------------
@@ -205,7 +212,8 @@ class Tool:
         lbl._fill = False
         lbl.bind('<Button-1>', self.update_fill)
         lbl.pack(padx = 6, pady = 3)
-        spacer = Label(frame1, image = self.white)
+        #Отступ
+        spacer = Label(frame1)
         spacer.pack(padx = 6, pady = 3)
         
         # FILL - FRAME 2
@@ -213,7 +221,8 @@ class Tool:
         lbl._fill = True
         lbl.bind('<Button-1>', self.update_fill)
         lbl.pack(padx = 6, pady = 3)
-        spacer = Label(frame2, image = self.white)
+        # Отступ
+        spacer = Label(frame2)
         spacer.pack(padx = 6, pady = 3)
         
         # COLOR WHEEL - FRAME 1
@@ -241,7 +250,7 @@ class Tool:
             lbl.bind('<Button-1>', self.update_color)
             lbl.pack(padx = 6, pady = 3)
             
-        spacer = Label(frame1, image = self.white)
+        spacer = Label(frame1)
         spacer.pack(padx = 6, pady = 3)
         spacer = Label(frame1, image = self.white)
         spacer.pack(padx = 6, pady = 3)
@@ -258,7 +267,7 @@ class Tool:
         # END OF FRAME 1
         frame1.pack(side = 'right', fill = 'y', expand = True, pady = 6)
 
-        spacer = Label(frame2, image = self.white)
+        spacer = Label(frame2)
         spacer.pack(padx = 6, pady = 3)
         spacer = Label(frame2, image = self.white)
         spacer.pack(padx = 6, pady = 3)
@@ -267,6 +276,16 @@ class Tool:
         lbl = Label(frame2, relief = 'raised', image = self.open)
         lbl.bind('<Button-1>', self.open_file)
         lbl.pack(padx = 6, pady = 3)
+
+        # CV2 - FRAME 2
+        lbl = Label(frame2, relief = 'raised', image = self.cv2)
+        lbl.bind('<Button-1>', self.opencv)
+        lbl.pack(padx = 6, pady = 3)
+
+        lbl = Label(frame2, relief = 'raised', image = self.cv2_2)
+        lbl.bind('<Button-1>', self.opencv_2)
+        lbl.pack(padx = 6, pady = 3)
+
         
         # END OF FRAME 2
         frame2.pack(side='right', fill = 'y', expand = True, pady = 6)
@@ -323,7 +342,8 @@ class Tool:
         if filename is None:  # on cancel, don't save
             return
         im.save(filename)
-        #im.show() 
+
+        #im.show()
         
     def open_file(self, event):
         filename = filedialog.askopenfilename(title = "Select file",filetypes = (("jpeg files","*.jpg"),("png files","*.png"),("gif files","*.gif"),("bmp files","*.bmp")))
@@ -338,6 +358,27 @@ class Tool:
     # Clear canvas
     def clear_canvas(self, event):
         canvas.delete("all")
+
+    def opencv(self, event):
+        filename = filedialog.askopenfilename(title = "Select file",filetypes = (("jpeg files","*.jpg"),("png files","*.png"),("gif files","*.gif"),("bmp files","*.bmp")))
+        imgtemp = Image.open(filename)
+        imgtemp.save("img.png", "png")
+        img = cv2.imread('img.png')
+        b_channel, g_channel, r_channel = cv2.split(img)
+        alpha_channel = np.ones(b_channel.shape, dtype = b_channel.dtype) * 3
+        img = cv2.merge((b_channel, g_channel, r_channel, alpha_channel))
+        cv2.imwrite("test.png", img)
+
+
+    def opencv_2(self, event):
+        filename = filedialog.askopenfilename(title = "Select file",filetypes = (("jpeg files","*.jpg"),("png files","*.png"),("gif files","*.gif"),("bmp files","*.bmp")))
+        imgtemp = Image.open(filename)
+        imgtemp.save("img.png", "png")
+        img = cv2.imread('img.png')
+        b_channel, g_channel, r_channel = cv2.split(img)
+        alpha_channel = np.ones(b_channel.shape, dtype = b_channel.dtype) * 255
+        img = cv2.merge((b_channel, g_channel, r_channel, alpha_channel))
+        cv2.imwrite("test.png", img)
 
 
 root = Tk()
